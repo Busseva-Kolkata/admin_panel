@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.disabled = true;
 
         try {
-            const response = await fetch('YOUR_BACKEND_URL/api/admin/login', {
+            const response = await fetch('https://busseva-backend-yhzz.onrender.com/api/admin/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
