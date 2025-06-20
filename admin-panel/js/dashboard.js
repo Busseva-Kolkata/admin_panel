@@ -36,7 +36,7 @@ async function loadBuses() {
     tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>';
 
     try {
-        const response = await fetch('YOUR_BACKEND_URL/api/buses', {
+        const response = await fetch('https://busseva-backend-yhzz.onrender.com/api/buses', {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             }
@@ -168,7 +168,7 @@ async function handleBusSubmit(e) {
     const formData = new FormData(form);
     
     try {
-        const response = await fetch('YOUR_BACKEND_URL/api/buses', {
+        const response = await fetch('https://busseva-backend-yhzz.onrender.com/api/buses', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
@@ -189,7 +189,7 @@ async function handleBusSubmit(e) {
 // Bus CRUD Operations
 async function editBus(busId) {
     try {
-        const response = await fetch(`YOUR_BACKEND_URL/api/buses/${busId}`, {
+        const response = await fetch(`https://busseva-backend-yhzz.onrender.com/api/buses/${busId}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             }
