@@ -10,7 +10,43 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeDashboard();
     loadBuses();
     setupEventListeners();
+    setupMobileMenu();
 });
+
+// Setup mobile menu functionality
+function setupMobileMenu() {
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mobileMenuOverlay');
+    
+    menuToggleBtn.addEventListener('click', () => {
+        sidebar.classList.add('show');
+        overlay.classList.remove('hidden');
+        overlay.classList.add('show');
+        document.body.classList.add('sidebar-open');
+    });
+    
+    closeSidebarBtn.addEventListener('click', closeMobileSidebar);
+    overlay.addEventListener('click', closeMobileSidebar);
+    
+    function closeMobileSidebar() {
+        sidebar.classList.remove('show');
+        overlay.classList.remove('show');
+        overlay.classList.add('hidden');
+        document.body.classList.remove('sidebar-open');
+    }
+    
+    // Close sidebar when clicking on a navigation link on mobile
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth < 768) {
+                closeMobileSidebar();
+            }
+        });
+    });
+}
 
 // Initialize dashboard components
 function initializeDashboard() {
@@ -55,29 +91,40 @@ async function loadBuses() {
 // Render buses in table
 function renderBuses(buses) {
     const tableBody = document.getElementById('busesTableBody');
+    const cardsContainer = document.getElementById('busesCardsContainer');
     tableBody.innerHTML = '';
+    cardsContainer.innerHTML = '';
+
+    if (buses.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">No buses found</td></tr>';
+        cardsContainer.innerHTML = '<div class="text-center py-8 text-gray-500">No buses found</div>';
+        return;
+    }
 
     buses.forEach(bus => {
+        // Render table row for desktop
         const row = document.createElement('tr');
         row.className = 'table-row-hover';
+        row.setAttribute('data-bus-name', bus.name?.toLowerCase() || '');
+        row.setAttribute('data-bus-status', bus.status || 'inactive');
         row.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                     <div class="flex-shrink-0 h-10 w-10">
-                        <img class="h-10 w-10 rounded-full" src="${bus.imageUrl}" alt="${bus.name}">
+                        <img class="h-10 w-10 rounded-full object-cover" src="${bus.imageUrl || 'https://via.placeholder.com/40'}" alt="${bus.name || 'Bus'}" onerror="this.src='https://via.placeholder.com/40'">
                     </div>
                     <div class="ml-4">
-                        <div class="text-sm font-medium text-gray-900">${bus.name}</div>
-                        <div class="text-sm text-gray-500">${bus.route}</div>
+                        <div class="text-sm font-medium text-gray-900">${bus.name || 'Unknown'}</div>
+                        <div class="text-sm text-gray-500">${bus.route || 'No route'}</div>
                     </div>
                 </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">${bus.route}</div>
+                <div class="text-sm text-gray-900">${bus.route || 'No route'}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <span class="status-badge ${bus.status === 'active' ? 'status-active' : 'status-inactive'}">
-                    ${bus.status}
+                    ${bus.status || 'inactive'}
                 </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -90,6 +137,33 @@ function renderBuses(buses) {
             </td>
         `;
         tableBody.appendChild(row);
+        
+        // Render card for mobile
+        const card = document.createElement('div');
+        card.className = 'bus-card bg-white rounded-lg shadow-md p-4';
+        card.setAttribute('data-bus-name', bus.name?.toLowerCase() || '');
+        card.setAttribute('data-bus-status', bus.status || 'inactive');
+        card.innerHTML = `
+            <div class="bus-card-header">
+                <img class="bus-card-image" src="${bus.imageUrl || 'https://via.placeholder.com/48'}" alt="${bus.name || 'Bus'}" onerror="this.src='https://via.placeholder.com/48'">
+                <div class="bus-card-info">
+                    <div class="bus-card-name">${bus.name || 'Unknown'}</div>
+                    <div class="bus-card-route">${bus.route || 'No route'}</div>
+                </div>
+                <span class="status-badge ${bus.status === 'active' ? 'status-active' : 'status-inactive'}">
+                    ${bus.status || 'inactive'}
+                </span>
+            </div>
+            <div class="bus-card-actions">
+                <button class="action-btn edit flex-1 bg-yellow-50 text-yellow-800 hover:bg-yellow-100" onclick="editBus('${bus._id}')">
+                    <i class="fas fa-edit mr-1"></i> Edit
+                </button>
+                <button class="action-btn delete flex-1 bg-red-50 text-red-800 hover:bg-red-100" onclick="deleteBus('${bus._id}')">
+                    <i class="fas fa-trash mr-1"></i> Delete
+                </button>
+            </div>
+        `;
+        cardsContainer.appendChild(card);
     });
 }
 
@@ -103,22 +177,36 @@ function setupEventListeners() {
     // Search functionality
     document.getElementById('searchBus').addEventListener('input', debounce((e) => {
         const searchTerm = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('#busesTableBody tr');
+        const tableRows = document.querySelectorAll('#busesTableBody tr');
+        const cards = document.querySelectorAll('#busesCardsContainer .bus-card');
         
-        rows.forEach(row => {
+        tableRows.forEach(row => {
+            const busName = row.getAttribute('data-bus-name') || '';
             const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchTerm) ? '' : 'none';
+            row.style.display = (busName.includes(searchTerm) || text.includes(searchTerm)) ? '' : 'none';
+        });
+        
+        cards.forEach(card => {
+            const busName = card.getAttribute('data-bus-name') || '';
+            const text = card.textContent.toLowerCase();
+            card.style.display = (busName.includes(searchTerm) || text.includes(searchTerm)) ? '' : 'none';
         });
     }, 300));
 
     // Filter functionality
     document.getElementById('filterBus').addEventListener('change', (e) => {
         const filterValue = e.target.value;
-        const rows = document.querySelectorAll('#busesTableBody tr');
+        const tableRows = document.querySelectorAll('#busesTableBody tr');
+        const cards = document.querySelectorAll('#busesCardsContainer .bus-card');
         
-        rows.forEach(row => {
-            const status = row.querySelector('.status-badge').textContent.trim();
-            row.style.display = !filterValue || status === filterValue ? '' : 'none';
+        tableRows.forEach(row => {
+            const status = row.getAttribute('data-bus-status') || '';
+            row.style.display = (!filterValue || status === filterValue) ? '' : 'none';
+        });
+        
+        cards.forEach(card => {
+            const status = card.getAttribute('data-bus-status') || '';
+            card.style.display = (!filterValue || status === filterValue) ? '' : 'none';
         });
     });
 

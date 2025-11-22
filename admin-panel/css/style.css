@@ -193,6 +193,121 @@
     .main-content {
         margin-left: 0;
     }
+    
+    /* Mobile Table Alternative - Card View */
+    .bus-card {
+        background: white;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 12px;
+    }
+    
+    .bus-card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
+    .bus-card-image {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 12px;
+    }
+    
+    .bus-card-info {
+        flex: 1;
+    }
+    
+    .bus-card-name {
+        font-weight: 600;
+        color: #1F2937;
+        margin-bottom: 4px;
+    }
+    
+    .bus-card-route {
+        color: #6B7280;
+        font-size: 0.875rem;
+    }
+    
+    .bus-card-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #E5E7EB;
+    }
+    
+    .bus-card-actions button {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    /* Touch-friendly buttons */
+    button, a {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Improved tap targets */
+    .action-btn {
+        padding: 10px 16px;
+    }
+    
+    /* Modal adjustments for mobile */
+    #busModal > div {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
+
+/* Tablet optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 200px;
+    }
+    
+    table th,
+    table td {
+        padding: 12px 16px;
+        font-size: 0.875rem;
+    }
+}
+
+/* Mobile menu overlay */
+#mobileMenuOverlay {
+    transition: opacity 0.3s ease;
+}
+
+#mobileMenuOverlay.show {
+    display: block;
+    opacity: 1;
+}
+
+/* Sidebar transitions */
+#sidebar {
+    transition: transform 0.3s ease-in-out;
+}
+
+#sidebar.show {
+    transform: translateX(0);
+}
+
+/* Prevent body scroll when sidebar is open on mobile */
+body.sidebar-open {
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    body.sidebar-open {
+        overflow: hidden;
+    }
 }
 
 /* Dashboard Stats Cards */
@@ -270,4 +385,101 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
-} 
+}
+
+/* Mobile-specific enhancements */
+@media (max-width: 640px) {
+    /* Increase padding for better touch */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    textarea,
+    select {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+    }
+    
+    /* Better spacing for mobile forms */
+    form {
+        padding: 0;
+    }
+    
+    /* Toast positioning for mobile */
+    .toast {
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+    
+    /* Table scrolling hint */
+    .table-container {
+        position: relative;
+    }
+    
+    .table-container::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 30px;
+        background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.05));
+        pointer-events: none;
+    }
+}
+
+/* Landscape mobile optimizations */
+@media (max-height: 500px) and (orientation: landscape) {
+    #busModal > div {
+        margin-top: 20px;
+        max-height: 85vh;
+    }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    img {
+        image-rendering: -webkit-optimize-contrast;
+    }
+}
+
+/* Focus states for accessibility and mobile */
+button:focus,
+a:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    outline: 2px solid #4F46E5;
+    outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Prevent text selection on buttons */
+button {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Improve tap highlighting */
+* {
+    -webkit-tap-highlight-color: rgba(79, 70, 229, 0.1);
+}
+
+/* Safe area padding for notched devices */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
+    }
+    
+    #sidebar {
+        padding-left: max(0px, env(safe-area-inset-left));
+    }
+}
